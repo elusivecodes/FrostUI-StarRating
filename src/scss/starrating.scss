@@ -1,0 +1,40 @@
+@import "functions";
+@import "vars";
+
+.starrating {
+    color: $starrating-color;
+
+    &:focus {
+        color: $starrating-focus-color;
+        outline: 0;
+    }
+}
+
+.starrating-animate .starrating-filled {
+    transition: width $transition-time $transition-type;
+}
+
+.starrating-disabled {
+    pointer-events: none;
+    opacity: $starrating-disabled-opacity;
+}
+
+.starrating-xl {
+    font-size: text-size($starrating-xl-font-size);
+}
+
+.starrating-lg {
+    font-size: text-size($starrating-lg-font-size);
+}
+
+.starrating-md {
+    font-size: text-size($starrating-md-font-size);
+}
+
+.starrating-sm {
+    font-size: text-size($starrating-sm-font-size);
+}
+
+.starrating-xs {
+    font-size: text-size($starrating-xs-font-size);
+}

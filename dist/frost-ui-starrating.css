@@ -1,0 +1,36 @@
+.starrating {
+  color: #ffb100;
+}
+.starrating:focus {
+  color: #e69f00;
+  outline: 0;
+}
+
+.starrating-animate .starrating-filled {
+  transition: width 0.25s ease-in-out;
+}
+
+.starrating-disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.starrating-xl {
+  font-size: clamp(1.65rem, calc(1.65rem + 1.32vw), 3rem);
+}
+
+.starrating-lg {
+  font-size: clamp(1.55rem, calc(1.55rem + 0.99vw), 2.5rem);
+}
+
+.starrating-md {
+  font-size: clamp(1.45rem, calc(1.45rem + 0.66vw), 2rem);
+}
+
+.starrating-sm {
+  font-size: clamp(1.35rem, calc(1.35rem + 0.33vw), 1.5rem);
+}
+
+.starrating-xs {
+  font-size: 1rem;
+}

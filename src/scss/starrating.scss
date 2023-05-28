@@ -1,13 +1,33 @@
-@import "functions";
 @import "vars";
 
 .starrating {
-    color: $starrating-color;
+    --ui-starrating-font-size: #{$starrating-font-size};
+    --ui-starrating-color: #{$starrating-color};
+    --ui-starrating-focus-box-shadow: #{$starrating-focus-box-shadow};
+    --ui-starrating-disabled-opacity: #{$starrating-disabled-opacity};
 
-    &:focus {
-        color: $starrating-focus-color;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    font-size: var(--ui-starrating-font-size);
+    line-height: 1;
+    color: var(--ui-starrating-color);
+    white-space: nowrap;
+
+    &:focus-visible {
         outline: 0;
+        box-shadow: var(--ui-starrating-focus-box-shadow);
     }
+
+    > * > * {
+        vertical-align: bottom;
+    }
+}
+
+.starrating-filled {
+    position: absolute;
+    top: 0;
+    overflow: hidden;
 }
 
 .starrating-animate .starrating-filled {
@@ -16,25 +36,21 @@
 
 .starrating-disabled {
     pointer-events: none;
-    opacity: $starrating-disabled-opacity;
+    opacity: var(--ui-starrating-disabled-opacity);
 }
 
 .starrating-xl {
-    font-size: text-size($starrating-xl-font-size);
+    --ui-starrating-font-size: #{$starrating-xl-font-size};
 }
 
 .starrating-lg {
-    font-size: text-size($starrating-lg-font-size);
-}
-
-.starrating-md {
-    font-size: text-size($starrating-md-font-size);
+    --ui-starrating-font-size: #{$starrating-lg-font-size};
 }
 
 .starrating-sm {
-    font-size: text-size($starrating-sm-font-size);
+    --ui-starrating-font-size: #{$starrating-sm-font-size};
 }
 
 .starrating-xs {
-    font-size: text-size($starrating-xs-font-size);
+    --ui-starrating-font-size: #{$starrating-xs-font-size};
 }

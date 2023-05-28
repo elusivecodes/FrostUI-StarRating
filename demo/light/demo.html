@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FrostUI StarRating</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/elusivecodes/frostui@1.4.6/dist/frost-ui.css">
-    <link rel="stylesheet" href="../dist/frost-ui-starrating.css">
-    <script src="https://cdn.jsdelivr.net/gh/elusivecodes/frostui@1.4.6/dist/frost-ui-bundle.js"></script>
-    <script src="../dist/frost-ui-starrating.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/elusivecodes/frostui@2.3.1/dist/frost-ui.css">
+    <link rel="stylesheet" href="../../dist/frost-ui-starrating.css">
+    <script src="https://cdn.jsdelivr.net/gh/elusivecodes/frostui@2.3.1/dist/frost-ui-bundle.js"></script>
+    <script src="../../dist/frost-ui-starrating.js"></script>
 </head>
 
 <body>
@@ -39,7 +39,7 @@
         </div>
         <div class="mb-4">
             <label for="starDisplayOnly">Display Only</label>
-            <input id="starDisplayOnly" type="number" value="3" readonly />
+            <input id="starDisplayOnly" type="number" value="3.5" readonly />
         </div>
         <div class="mb-4">
             <label for="starDisabled">Disabled</label>
@@ -47,17 +47,17 @@
         </div>
     </div>
     <script>
-        const starDefault = dom.findOne('#starDefault');
-        const starXs = dom.findOne('#starXs');
-        const starSm = dom.findOne('#starSm');
-        const starMd = dom.findOne('#starMd');
-        const starLg = dom.findOne('#starLg');
-        const starXl = dom.findOne('#starXl');
-        const starStars = dom.findOne('#starStars');
-        const starStep = dom.findOne('#starStep');
-        const starMinMax = dom.findOne('#starMinMax');
-        const starDisplayOnly = dom.findOne('#starDisplayOnly');
-        const starDisabled = dom.findOne('#starDisabled');
+        const starDefault = $.findOne('#starDefault');
+        const starXs = $.findOne('#starXs');
+        const starSm = $.findOne('#starSm');
+        const starMd = $.findOne('#starMd');
+        const starLg = $.findOne('#starLg');
+        const starXl = $.findOne('#starXl');
+        const starStars = $.findOne('#starStars');
+        const starStep = $.findOne('#starStep');
+        const starMinMax = $.findOne('#starMinMax');
+        const starDisplayOnly = $.findOne('#starDisplayOnly');
+        const starDisabled = $.findOne('#starDisabled');
 
         UI.StarRating.init(starDefault);
         UI.StarRating.init(starXs);

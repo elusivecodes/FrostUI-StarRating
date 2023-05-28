@@ -1,23 +1,14 @@
-$disabled-opacity: .5 !default;
-
 // transition
 $transition-time: .25s !default;
 $transition-type: ease-in-out !default;
 
-// heading
-$h1-font-size: 3 !default;
-$h2-font-size: 2.5 !default;
-$h3-font-size: 2 !default;
-$h4-font-size: 1.5 !default;
-$h5-font-size: 1 !default;
-
 // starrating
+$starrating-font-size: clamp(1.45rem, calc(1.45rem + .66vw), 2rem) !default;
 $starrating-color: #ffb100 !default;
-$starrating-focus-color: shade($starrating-color, 10%) !default;
-$starrating-disabled-opacity: $disabled-opacity !default;
+$starrating-focus-box-shadow: 0 0 0 var(--ui-focus-ring-width) var(--ui-focus-ring-color) !default;
+$starrating-disabled-opacity: var(--ui-disabled-opacity) !default;
 
-$starrating-xl-font-size: $h1-font-size !default;
-$starrating-lg-font-size: $h2-font-size !default;
-$starrating-md-font-size: $h3-font-size !default;
-$starrating-sm-font-size: $h4-font-size !default;
-$starrating-xs-font-size: $h5-font-size !default;
+$starrating-xl-font-size: clamp(1.65rem, calc(1.65rem + 1.32vw), 3rem) !default;
+$starrating-lg-font-size: clamp(1.55rem, calc(1.55rem + .99vw), 2.5rem) !default;
+$starrating-sm-font-size: clamp(1.35rem, calc(1.35rem + .33vw), 1.5rem) !default;
+$starrating-xs-font-size: 1rem !default;

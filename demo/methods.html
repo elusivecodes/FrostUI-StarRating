@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FrostUI StarRating Methods</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/elusivecodes/frostui@1.4.6/dist/frost-ui.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/elusivecodes/frostui@2.3.1/dist/frost-ui.css">
     <link rel="stylesheet" href="../dist/frost-ui-starrating.css">
-    <script src="https://cdn.jsdelivr.net/gh/elusivecodes/frostui@1.4.6/dist/frost-ui-bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/elusivecodes/frostui@2.3.1/dist/frost-ui-bundle.js"></script>
     <script src="../dist/frost-ui-starrating.js"></script>
 </head>
 
@@ -34,41 +34,41 @@
         <samp id="output"></samp>
     </div>
     <script>
-        const starDefault = dom.findOne('#starDefault');
-        const starInit = dom.findOne('#starInit');
-        const starDispose = dom.findOne('#starDispose');
-        const starEnable = dom.findOne('#starEnable');
-        const starDisable = dom.findOne('#starDisable');
-        const starGetValue = dom.findOne('#starGetValue');
-        const starSetValue = dom.findOne('#starSetValue');
-        const output = dom.findOne('#output');
+        const starDefault = $.findOne('#starDefault');
+        const starInit = $.findOne('#starInit');
+        const starDispose = $.findOne('#starDispose');
+        const starEnable = $.findOne('#starEnable');
+        const starDisable = $.findOne('#starDisable');
+        const starGetValue = $.findOne('#starGetValue');
+        const starSetValue = $.findOne('#starSetValue');
+        const output = $.findOne('#output');
 
-        dom.addEvent(starInit, 'click', e => {
+        $.addEvent(starInit, 'click', e => {
             UI.StarRating.init(starDefault);
         });
 
-        dom.addEvent(starDispose, 'click', e => {
+        $.addEvent(starDispose, 'click', e => {
             UI.StarRating.init(starDefault).dispose();
         });
 
-        dom.addEvent(starEnable, 'click', e => {
+        $.addEvent(starEnable, 'click', e => {
             UI.StarRating.init(starDefault).enable();
         });
 
-        dom.addEvent(starDisable, 'click', e => {
+        $.addEvent(starDisable, 'click', e => {
             UI.StarRating.init(starDefault).disable();
         });
 
-        dom.addEvent(starGetValue, 'click', e => {
+        $.addEvent(starGetValue, 'click', e => {
             const value = UI.StarRating.init(starDefault).getValue();
-            dom.setText(output, `Value: ${value}`);
+            $.setText(output, `Value: ${value}`);
         });
 
-        dom.addEvent(starSetValue, 'click', e => {
+        $.addEvent(starSetValue, 'click', e => {
             UI.StarRating.init(starDefault).setValue(5);
         });
 
-        dom.triggerEvent(starInit, 'click');
+        $.triggerEvent(starInit, 'click');
     </script>
 </body>
 

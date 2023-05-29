@@ -205,7 +205,7 @@
     /**
      * Clamp a value to a step-size, and between a min and max value.
      * @param {number} value The value to clamp.
-     * @returns The clamped value.
+     * @return {number} The clamped value.
      */
     function _clampValue(value) {
         if (this._options.step) {

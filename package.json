@@ -1,6 +1,6 @@
 {
     "name": "@fr0st/ui-starrating",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "description": "FrostUI-StarRating is a free, open-source Star Rating component for Javascript.",
     "keywords": [
         "ui",
@@ -50,7 +50,7 @@
         "eslint": "^8.41.0",
         "eslint-config-google": "^0.14.0",
         "find-unused-sass-variables": "^5.0.0",
-        "postcss": "^8.4.23",
+        "postcss": "^8.4.24",
         "postcss-cli": "^10.1.0",
         "rollup": "^3.23.0",
         "sass": "^1.62.1",

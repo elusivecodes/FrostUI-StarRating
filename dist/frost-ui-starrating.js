@@ -17,10 +17,6 @@
         constructor(node, options) {
             super(node, options);
 
-            if (this._options.step) {
-                this._stepLength = `${this._options.step}`.replace('\d*\.?/', '').length;
-            }
-
             if ($.hasAttribute(this._node, 'step')) {
                 this._options.step = $.getAttribute(this._node, 'step');
             }
@@ -37,8 +33,20 @@
                 this._options.max = this._options.stars;
             }
 
-            if ($.is(this._node, '[readonly]')) {
+            if ($.getProperty(this._node, 'readOnly')) {
                 this._options.displayOnly = true;
+            }
+
+            if (this._options.step) {
+                this._stepLength = `${this._options.step}`.replace('\d*\.?/', '').length;
+            }
+
+            const id = $.getAttribute(this._node, 'id');
+            this._label = $.findOne(`label[for="${id}"]`);
+
+            if (this._label && !$.getAttribute(this._label, 'id')) {
+                $.setAttribute(this._label, { id: ui.generateId('starrating-label') });
+                this._labelId = true;
             }
 
             this._render();
@@ -67,6 +75,10 @@
          * Dispose the StarRating.
          */
         dispose() {
+            if (this._labelId) {
+                $.removeAttribute(this._label, 'id');
+            }
+
             if (this._tooltip) {
                 this._tooltip.dispose();
                 this._tooltip = null;
@@ -77,6 +89,7 @@
             $.removeEvent(this._node, 'focus.ui.starrating');
             $.removeClass(this._node, this.constructor.classes.hide);
 
+            this._label = null;
             this._outerContainer = null;
             this._container = null;
             this._filledContainer = null;
@@ -120,7 +133,7 @@
 
             $.setStyle(this._filledContainer, { width: `${percent}%` });
 
-            this._setTooltipText(value);
+            this._updateValue(value);
 
             $.setValue(this._node, value);
             $.triggerEvent(this._node, 'change.ui.starrating');
@@ -135,36 +148,64 @@
             $.focus(this._container);
         });
 
-        $.addEvent(this._container, 'click.ui.starrating', (e) => {
-            const percentX = $.percentX(this._container, e.pageX, { offset: true });
+        const downEvent = (e) => {
+            if (
+                e.button ||
+                $.is(this._node, ':disabled')
+            ) {
+                return false;
+            }
+
+            $.setStyle(this._filledContainer, { transition: 'none' });
+
+            const pos = ui.getPosition(e);
+            const percentX = $.percentX(this._container, pos.x, { offset: true });
             const value = this._getValue(percentX);
 
             this.setValue(value);
-        });
 
-        $.addEvent(this._container, 'mousemove.ui.starrating', $.debounce((e) => {
-            const percentX = $.percentX(this._container, e.pageX, { offset: true });
+            $.setDataset(this._container, { uiDragging: true });
+
+            if (this._options.tooltip && !$.getDataset(this._container, 'uiHover')) {
+                this._tooltip._stop();
+                this._tooltip.show();
+            }
+        };
+
+        const moveEvent = (e) => {
+            const pos = ui.getPosition(e);
+            const percentX = $.percentX(this._container, pos.x, { offset: true });
             const value = this._getValue(percentX);
-            const percent = this._getPercent(value);
 
-            if (this._options.animate) {
-                $.setStyle(this._filledContainer, { transition: 'none' });
+            this.setValue(value);
+        };
+
+        const upEvent = (e) => {
+            $.removeDataset(this._container, 'uiDragging');
+
+            if (this._options.tooltip && !$.getDataset(this._container, 'uiHover')) {
+                this._tooltip._stop();
+                this._tooltip.hide();
             }
 
-            $.setStyle(this._filledContainer, { width: `${percent}%` });
+            const pos = ui.getPosition(e);
+            const percentX = $.percentX(this._container, pos.x, { offset: true });
+            const value = this._getValue(percentX);
 
-            if (this._options.animate) {
-                // force redraw
-                $.rect(this._filledContainer);
-                $.setStyle(this._filledContainer, { transition: '' });
+            if (value === this.getValue()) {
+                this._updateValue(value);
+            } else {
+                this.setValue(value);
             }
 
-            this._setTooltipText(value);
-        }), { passive: true });
+            // force redraw
+            $.rect(this._filledContainer);
+            $.setStyle(this._filledContainer, { transition: '' });
+        };
 
-        $.addEvent(this._container, 'mouseleave.ui.starrating', (_) => {
-            this._refresh();
-        });
+        const dragEvent = $.mouseDragFactory(downEvent, moveEvent, upEvent);
+
+        $.addEvent(this._container, 'mousedown.ui.starrating touchstart.ui.starrating', dragEvent);
 
         $.addEvent(this._container, 'keydown.ui.starrating', (e) => {
             let value = this.getValue();
@@ -175,10 +216,24 @@
 
             switch (e.code) {
                 case 'ArrowLeft':
-                    value = Math.max(this._options.min, value - this._options.step);
+                case 'ArrowDown':
+                    value -= this._options.step;
                     break;
                 case 'ArrowRight':
-                    value = Math.min(this._options.max, value + this._options.step);
+                case 'ArrowUp':
+                    value += this._options.step;
+                    break;
+                case 'End':
+                    value = this._options.max;
+                    break;
+                case 'Home':
+                    value = this._options.min;
+                    break;
+                case 'PageDown':
+                    value--;
+                    break;
+                case 'PageUp':
+                    value++;
                     break;
                 default:
                     return;
@@ -186,19 +241,77 @@
 
             this.setValue(value);
         });
+
+        if (this._options.hover) {
+            this._hoverEvents();
+        }
+    }
+    /**
+     * Attach hover events for the StarRating.
+     */
+    function _hoverEvents() {
+        $.addEvent(this._container, 'mousemove.ui.starrating', $.debounce((e) => {
+            if (
+                $.is(this._node, ':disabled') ||
+                $.getDataset(this._container, 'uiDragging')
+            ) {
+                return;
+            }
+
+            const percentX = $.percentX(this._container, e.pageX, { offset: true });
+            const value = this._getValue(percentX);
+
+            const percent = this._getPercent(value);
+
+            $.setStyle(this._filledContainer, { transition: 'none' });
+            $.setStyle(this._filledContainer, { width: `${percent}%` });
+
+            // force redraw
+            $.rect(this._filledContainer);
+            $.setStyle(this._filledContainer, { transition: '' });
+
+            this._updateValue(value, { updateAria: false });
+        }), { passive: true });
+
+        $.addEvent(this._container, 'mouseleave.ui.starrating', (_) => {
+            if (
+                $.is(this._node, ':disabled') ||
+                $.getDataset(this._container, 'uiDragging')
+            ) {
+                return;
+            }
+
+            this._refresh();
+        });
     }
     /**
      * Attach events for the StarRating tooltip.
      */
     function _tooltipEvents() {
-        $.addEvent(this._container, 'mouseenter.ui.starrating', (_) => {
-            this._tooltip._stop();
-            this._tooltip.show();
+        $.addEvent(this._container, 'mouseenter.ui.starrating', (e) => {
+            if (!$.isSame(e.target, this._container)) {
+                return;
+            }
+
+            if (!$.getDataset(this._container, 'uiDragging')) {
+                this._tooltip._stop();
+                this._tooltip.show();
+            }
+
+            $.setDataset(this._container, { uiHover: true });
         });
 
-        $.addEvent(this._container, 'mouseleave.ui.starrating', (_) => {
-            this._tooltip._stop();
-            this._tooltip.hide();
+        $.addEvent(this._container, 'mouseleave.ui.starrating', (e) => {
+            if (!$.isSame(e.target, this._container)) {
+                return;
+            }
+
+            if (!$.getDataset(this._container, 'uiDragging')) {
+                this._tooltip._stop();
+                this._tooltip.hide();
+            }
+
+            $.removeDataset(this._container, 'uiHover');
         });
     }
 
@@ -244,36 +357,50 @@
 
         $.setStyle(this._filledContainer, { width: `${percent}%` });
 
-        this._setTooltipText(value);
+        this._updateValue(value);
     }
     /**
      * Refresh the disabled styling.
      */
     function _refreshDisabled() {
-        if ($.is(this._node, ':disabled')) {
+        const disabled = $.is(this._node, ':disabled');
+
+        if (disabled) {
             $.addClass(this._container, this.constructor.classes.disabled);
         } else {
             $.removeClass(this._container, this.constructor.classes.disabled);
         }
+
+        $.setAttribute(this._container, {
+            'aria-disabled': disabled,
+            'tabindex': disabled ? -1 : 0,
+        });
     }
     /**
-     * Set the tooltip text.
+     * Update the value.
      * @param {number} value The value.
+     * @param {object} [options] The options for updating the value.
      */
-    function _setTooltipText(value) {
-        if (!this._tooltip) {
-            return;
-        }
-
+    function _updateValue(value, { updateAria = true, updateTooltip = true } = {}) {
         if (value === null) {
             value = this._options.min;
         }
 
-        const ratingText = this._options.tooltipText.bind(this)(value);
-        $.setDataset(this._container, { uiTitle: ratingText });
+        const ratingText = this._options.ratingText.bind(this)(value);
 
-        this._tooltip.refresh();
-        this._tooltip.update();
+        if (updateAria) {
+            $.setAttribute(this._container, {
+                'aria-valuenow': value,
+                'aria-valuetext': ratingText,
+            });
+        }
+
+        if (updateTooltip && this._tooltip) {
+            $.setDataset(this._container, { uiTitle: ratingText });
+
+            this._tooltip.refresh();
+            this._tooltip.update();
+        }
     }
 
     /**
@@ -286,10 +413,18 @@
             $.addClass(this._outerContainer, this.constructor.classes.animate);
         }
 
+        const value = this.getValue() || 0;
+
         this._container = $.create('div', {
             class: [this.constructor.classes.container, `starrating-${this._options.size}`],
             attributes: {
-                tabindex: 0,
+                'role': 'slider',
+                'aria-valuenow': value,
+                'aria-valuetext': this._options.ratingText.bind(this)(value),
+                'aria-valuemin': this._options.min,
+                'aria-valuemax': this._options.max,
+                'aria-required': $.getProperty(this._node, 'required'),
+                'aria-labelledby': $.getAttribute(this._label, 'id'),
             },
         });
 
@@ -336,10 +471,13 @@
         max: null,
         step: 1,
         stars: 5,
+        ratingText(rating) {
+            return rating === 1 ?
+                `${rating} ${this.constructor.lang.star}` :
+                `${rating} ${this.constructor.lang.stars}`;
+        },
         tooltip: true,
-        tooltipText: (rating) => rating === 1 ?
-            `${rating} star` :
-            `${rating} stars`,
+        hover: true,
         animate: true,
         displayOnly: false,
     };
@@ -360,6 +498,12 @@
         outline: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M12 15.39l-3.76 2.27l.99-4.28l-3.32-2.88l4.38-.37L12 6.09l1.71 4.04l4.38.37l-3.32 2.88l.99 4.28M22 9.24l-7.19-.61L12 2L9.19 8.63L2 9.24l5.45 4.73L5.82 21L12 17.27L18.18 21l-1.64-7.03L22 9.24z" fill="currentColor"/></svg>',
     };
 
+    // StarRating lang
+    StarRating.lang = {
+        star: 'star',
+        stars: 'stars'
+    };
+
     // StarRating prototype
     const proto = StarRating.prototype;
 
@@ -367,11 +511,12 @@
     proto._events = _events;
     proto._getPercent = _getPercent;
     proto._getValue = _getValue;
+    proto._hoverEvents = _hoverEvents;
     proto._refresh = _refresh;
     proto._refreshDisabled = _refreshDisabled;
     proto._render = _render;
     proto._tooltipEvents = _tooltipEvents;
-    proto._setTooltipText = _setTooltipText;
+    proto._updateValue = _updateValue;
 
     // StarRating init
     ui.initComponent('starrating', StarRating);

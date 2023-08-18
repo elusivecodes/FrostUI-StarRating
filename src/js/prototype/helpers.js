@@ -45,36 +45,50 @@ export function _refresh() {
 
     $.setStyle(this._filledContainer, { width: `${percent}%` });
 
-    this._setTooltipText(value);
+    this._updateValue(value);
 };
 
 /**
  * Refresh the disabled styling.
  */
 export function _refreshDisabled() {
-    if ($.is(this._node, ':disabled')) {
+    const disabled = $.is(this._node, ':disabled');
+
+    if (disabled) {
         $.addClass(this._container, this.constructor.classes.disabled);
     } else {
         $.removeClass(this._container, this.constructor.classes.disabled);
     }
+
+    $.setAttribute(this._container, {
+        'aria-disabled': disabled,
+        'tabindex': disabled ? -1 : 0,
+    });
 };
 
 /**
- * Set the tooltip text.
+ * Update the value.
  * @param {number} value The value.
+ * @param {object} [options] The options for updating the value.
  */
-export function _setTooltipText(value) {
-    if (!this._tooltip) {
-        return;
-    }
-
+export function _updateValue(value, { updateAria = true, updateTooltip = true } = {}) {
     if (value === null) {
         value = this._options.min;
     }
 
-    const ratingText = this._options.tooltipText.bind(this)(value);
-    $.setDataset(this._container, { uiTitle: ratingText });
+    const ratingText = this._options.ratingText.bind(this)(value);
 
-    this._tooltip.refresh();
-    this._tooltip.update();
+    if (updateAria) {
+        $.setAttribute(this._container, {
+            'aria-valuenow': value,
+            'aria-valuetext': ratingText,
+        });
+    }
+
+    if (updateTooltip && this._tooltip) {
+        $.setDataset(this._container, { uiTitle: ratingText });
+
+        this._tooltip.refresh();
+        this._tooltip.update();
+    }
 };

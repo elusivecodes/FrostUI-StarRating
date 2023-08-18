@@ -1,5 +1,5 @@
 import $ from '@fr0st/query';
-import { BaseComponent } from '@fr0st/ui';
+import { BaseComponent, generateId } from '@fr0st/ui';
 
 /**
  * StarRating Class
@@ -13,10 +13,6 @@ export default class StarRating extends BaseComponent {
      */
     constructor(node, options) {
         super(node, options);
-
-        if (this._options.step) {
-            this._stepLength = `${this._options.step}`.replace('\d*\.?/', '').length;
-        }
 
         if ($.hasAttribute(this._node, 'step')) {
             this._options.step = $.getAttribute(this._node, 'step');
@@ -34,8 +30,20 @@ export default class StarRating extends BaseComponent {
             this._options.max = this._options.stars;
         }
 
-        if ($.is(this._node, '[readonly]')) {
+        if ($.getProperty(this._node, 'readOnly')) {
             this._options.displayOnly = true;
+        }
+
+        if (this._options.step) {
+            this._stepLength = `${this._options.step}`.replace('\d*\.?/', '').length;
+        }
+
+        const id = $.getAttribute(this._node, 'id');
+        this._label = $.findOne(`label[for="${id}"]`);
+
+        if (this._label && !$.getAttribute(this._label, 'id')) {
+            $.setAttribute(this._label, { id: generateId('starrating-label') });
+            this._labelId = true;
         }
 
         this._render();
@@ -64,6 +72,10 @@ export default class StarRating extends BaseComponent {
      * Dispose the StarRating.
      */
     dispose() {
+        if (this._labelId) {
+            $.removeAttribute(this._label, 'id');
+        }
+
         if (this._tooltip) {
             this._tooltip.dispose();
             this._tooltip = null;
@@ -74,6 +86,7 @@ export default class StarRating extends BaseComponent {
         $.removeEvent(this._node, 'focus.ui.starrating');
         $.removeClass(this._node, this.constructor.classes.hide);
 
+        this._label = null;
         this._outerContainer = null;
         this._container = null;
         this._filledContainer = null;
@@ -117,7 +130,7 @@ export default class StarRating extends BaseComponent {
 
         $.setStyle(this._filledContainer, { width: `${percent}%` });
 
-        this._setTooltipText(value);
+        this._updateValue(value);
 
         $.setValue(this._node, value);
         $.triggerEvent(this._node, 'change.ui.starrating');

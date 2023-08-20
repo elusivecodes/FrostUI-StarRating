@@ -41,7 +41,7 @@ StarRating.icons = {
 // StarRating lang
 StarRating.lang = {
     star: 'star',
-    stars: 'stars'
+    stars: 'stars',
 };
 
 // StarRating prototype

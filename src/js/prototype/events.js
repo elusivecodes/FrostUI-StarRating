@@ -27,9 +27,8 @@ export function _events() {
 
         $.setDataset(this._container, { uiDragging: true });
 
-        if (this._options.tooltip && !$.getDataset(this._container, 'uiHover')) {
-            this._tooltip._stop();
-            this._tooltip.show();
+        if (this._options.tooltip) {
+            this._triggerTooltip('drag');
         }
     };
 
@@ -44,9 +43,8 @@ export function _events() {
     const upEvent = (e) => {
         $.removeDataset(this._container, 'uiDragging');
 
-        if (this._options.tooltip && !$.getDataset(this._container, 'uiHover')) {
-            this._tooltip._stop();
-            this._tooltip.hide();
+        if (this._options.tooltip) {
+            this._triggerTooltip('drag', false);
         }
 
         const pos = getPosition(e);
@@ -151,17 +149,32 @@ export function _hoverEvents() {
  * Attach events for the StarRating tooltip.
  */
 export function _tooltipEvents() {
+    const tooltipTriggers = {};
+
+    this._triggerTooltip = $._debounce((type, show = true) => {
+        if (show) {
+            if (!Object.keys(tooltipTriggers).length) {
+                this._tooltip._stop();
+                this._tooltip.show();
+            }
+
+            tooltipTriggers[type] = true;
+        } else {
+            delete tooltipTriggers[type];
+
+            if (!Object.keys(tooltipTriggers).length) {
+                this._tooltip._stop();
+                this._tooltip.hide();
+            }
+        }
+    });
+
     $.addEvent(this._container, 'mouseenter.ui.starrating', (e) => {
         if (!$.isSame(e.target, this._container)) {
             return;
         }
 
-        if (!$.getDataset(this._container, 'uiDragging')) {
-            this._tooltip._stop();
-            this._tooltip.show();
-        }
-
-        $.setDataset(this._container, { uiHover: true });
+        this._triggerTooltip('hover');
     });
 
     $.addEvent(this._container, 'mouseleave.ui.starrating', (e) => {
@@ -169,11 +182,6 @@ export function _tooltipEvents() {
             return;
         }
 
-        if (!$.getDataset(this._container, 'uiDragging')) {
-            this._tooltip._stop();
-            this._tooltip.hide();
-        }
-
-        $.removeDataset(this._container, 'uiHover');
+        this._triggerTooltip('hover', false);
     });
 };

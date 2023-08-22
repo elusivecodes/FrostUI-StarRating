@@ -11,16 +11,14 @@ export function _render() {
         $.addClass(this._outerContainer, this.constructor.classes.animate);
     }
 
-    const value = this.getValue() || 0;
-
     this._container = $.create('div', {
         class: [this.constructor.classes.container, `starrating-${this._options.size}`],
         attributes: {
             'role': 'slider',
-            'aria-valuenow': value,
-            'aria-valuetext': this._options.ratingText.bind(this)(value),
             'aria-valuemin': this._options.min,
             'aria-valuemax': this._options.max,
+            'aria-valuenow': '',
+            'aria-valuetext': '',
             'aria-required': $.getProperty(this._node, 'required'),
             'aria-labelledby': $.getAttribute(this._label, 'id'),
         },

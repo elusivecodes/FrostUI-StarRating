@@ -430,9 +430,13 @@
                 'aria-valuenow': '',
                 'aria-valuetext': '',
                 'aria-required': $.getProperty(this._node, 'required'),
-                'aria-labelledby': $.getAttribute(this._label, 'id'),
             },
         });
+
+        if (this._label) {
+            const labelId = $.getAttribute(this._label, 'id');
+            $.setAttribute(this._container, { 'aria-labelledby': labelId });
+        }
 
         const outline = [];
         const filled = [];

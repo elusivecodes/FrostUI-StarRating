@@ -201,7 +201,7 @@
             $.setStyle(this._filledContainer, { transition: '' });
         };
 
-        const dragEvent = $.mouseDragFactory(downEvent, moveEvent, upEvent);
+        const dragEvent = $.mouseDragFactory(downEvent, moveEvent, upEvent, { preventDefault: false });
 
         $.addEvent(this._container, 'mousedown.ui.starrating touchstart.ui.starrating', dragEvent);
 
